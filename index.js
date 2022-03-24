@@ -11,8 +11,9 @@ const multer = require("multer");
 const path = require("path");
 
 dotenv.config();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
+
 app.use("/images", express.static(path.join(__dirname, "/images")));
 
 const PORT=process.env.PORT;
@@ -25,21 +26,29 @@ mongoose
     useFindAndModify:true
   })
   .then(console.log("Connected to MongoDB"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log("Error in DB connection",err));
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "images");
-  },
-  filename: (req, file, cb) => {
-    cb(null, req.body.name);
-  },
-});
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "images");
+    },
+    filename: (req, file, cb) => {
+      console.log(req.body);
+      cb(null, file.originalname);
+    },
+  });
 
 const upload = multer({ storage: storage });
 app.post("/api/upload", upload.single("file"), (req, res) => {
-  res.status(200).json("File has been uploaded");
+  try {
+    console.log("in upload", req.file);
+    console.log("In image upload");
+    res.status(200).send("file has been uploaded");
+  } catch (err) {
+    res.status(500).send("error in uploading");
+  }
 });
+
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);

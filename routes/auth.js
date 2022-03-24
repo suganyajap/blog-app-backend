@@ -14,7 +14,7 @@ router.post("/register", async (req, res) => {
     });
 
     const user = await newUser.save();
-    res.status(200).json(user);
+    res.status(200).send({ register: "user registered successfully", user });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -30,7 +30,10 @@ router.post("/login", async (req, res) => {
     !validated && res.status(400).json("Wrong credentials!");
 
     const { password, ...others } = user._doc;
-    res.status(200).json(others);
+    res.status(200).send({
+      Message: "user Logged in Successfully",
+      others,
+    });
   } catch (err) {
     res.status(500).json(err);
   }
